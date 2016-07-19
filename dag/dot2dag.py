@@ -84,3 +84,21 @@ def add_dag_indeces(task_graph):
                 task.dag_index = dag_index
                 task.workload = workload
     return task_graph
+
+
+def setup_dag(dag_file_path, applications, num_apps):
+    '''TODO: add file exception handling'''
+    dot_dag_file = open(dag_file_path,"r")
+    dot_dag = dot2dag(dot_dag_file)
+    dot_dag_file.close()
+    
+    toposort_ordering = order_dag(dot_dag)
+    dot_toposorted = list(toposort(dot_dag))
+    task_graph_by_index = dag2indeces(dot_toposorted, toposort_ordering)
+    (task_graph_by_index, num_dag_nodes) = dag2list(task_graph_by_index)
+    
+    task_graph = dag2allTasks(task_graph_by_index, applications, num_apps)
+    task_graph = add_dag_indeces(task_graph)
+    
+    return task_graph, num_dag_nodes
+    

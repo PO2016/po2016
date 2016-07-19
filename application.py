@@ -88,18 +88,30 @@ def get_closest_task(taskFile, powerPerTask):
                 closestTask = task
     return closestTask
 
-def get_tasks_per_power(tasks, applications, power):
+def get_tasks_per_power(tasks, applications, power, power_cap):
     new_tasks = []
+    waitlist = []
     for task in tasks:
         new_task = get_closest_task(applications[task.index].tasks, power)
-        if new_task is None or new_task.configIndex == -1:
-            print("ERROR Couldn't find task for the power allocated. Power = ", power)
-            sys.exit()
-            new_task = applications[task.index].idle
         new_task.dag_index = task.dag_index
         if new_task.speed > 0:
             new_task.workload = task.workload
             new_task.time = new_task.workload / new_task.speed
-        new_tasks.append(new_task)
-    return new_tasks
+        if new_task.configIndex == -1:
+            waitlist.append(new_task)
+            power = power_cap / (len(tasks) - len(waitlist))
+            if power == power_cap and len(tasks) == 1:
+                print("ERROR there is only one task and the power cap is not high enough.")
+                sys.exit()
+            if len(waitlist) == len(tasks):
+                print("ERROR no tasks can be scheduled under the given power cap.")
+                sys.exit()
+            #print("ERROR Couldn't find task for the power allocated. Power = ", power)
+            #sys.exit()
+            #new_task = applications[task.index].idle
+        else:
+            new_tasks.append(new_task)
+    z = len(new_tasks)
+    new_tasks += waitlist
+    return new_tasks, z
     

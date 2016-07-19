@@ -21,39 +21,39 @@ num_apps = 0
 
 dag_name = ""
 
-myopts, args = getopt.getopt(sys.argv[1:],"k:C:a:d:N:P:D:T:")
+#myopts, args = getopt.getopt(sys.argv[1:],"k:C:a:d:N:P:D:T:")
 
-for o, a in myopts:
-    if o == '-k':
-        num_machines = int(a)
-    if o == '-C':
-        power_cap = float(a)
-    if o == '-a':
-        num_apps = int(a)
-    if o == '-d':
-        dag_name = a
-    if o == '-N':
-        NATIVE = 1
-    if o == '-P':
-        POWOPT = 1
-    if o == '-D':
-        DEBUG = 1
-    if o == '-T':
-        TRACE = 1
+#for o, a in myopts:
+    #if o == '-k':
+        #num_machines = int(a)
+    #if o == '-C':
+        #power_cap = float(a)
+    #if o == '-a':
+        #num_apps = int(a)
+    #if o == '-d':
+        #dag_name = a
+    #if o == '-N':
+        #NATIVE = 1
+    #if o == '-P':
+        #POWOPT = 1
+    #if o == '-D':
+        #DEBUG = 1
+    #if o == '-T':
+        #TRACE = 1
 
-if num_machines == 0 or power_cap == 0 or num_apps == 0 or len(dag_name) == 0 or (NAIVE == 0 and POWOPT == 0):
-    print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
-    print("Usage:")
-    print("\t-k [#number of machines]")
-    print("\t-C [power cap (W)]")
-    print("\t-a [#number of applications with power-performance measurements]")
-    print("\t-d [name of the dot file containing the DAG]")
-    print("\t-N [run the static/naive version]")
-    print("\t-P [run the Power-OPT algorithm]")
-    print("\t-D [debug mode]")
-    print("\t-T [trace mode]")
-    print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
-    sys.exit(0)
+#if num_machines == 0 or power_cap == 0 or num_apps == 0 or len(dag_name) == 0 or (NAIVE == 0 and POWOPT == 0):
+    #print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
+    #print("Usage:")
+    #print("\t-k [#number of machines]")
+    #print("\t-C [power cap (W)]")
+    #print("\t-a [#number of applications with power-performance measurements]")
+    #print("\t-d [name of the dot file containing the DAG]")
+    #print("\t-N [run the static/naive version]")
+    #print("\t-P [run the Power-OPT algorithm]")
+    #print("\t-D [debug mode]")
+    #print("\t-T [trace mode]")
+    #print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
+    #sys.exit(0)
 
 if DEBUG:
     print("Initializing all applications...")
