@@ -7,16 +7,11 @@ from po2016 import scheduler as sc
 from po2016.run import Run
 
 DEBUG, TRACE = dbg.get_debug_level()
-
-def setup_dag_POW_Opt(dag_file_path, applications, num_apps):
-    setup_dag(dag_file_path, applications, num_apps)
     
-def POW_Opt(num_machines, power_cap, dag_file_path):
+def POW_Opt(num_machines, power_cap, job, applications):
     
-    applications = init_all_apps(num_apps)
-    applications = reduce_application_space(applications)
-    
-    (task_graph, num_dag_nodes) = setup_dag_POW_Opt(dag_file_path, applications, num_apps)
+    task_graph = job.dag
+    num_dag_nodes = job.num_dag_nodes
     
     (task_pace_toposorted, all_pace_tasks) = get_pace_tasks(task_graph)
     

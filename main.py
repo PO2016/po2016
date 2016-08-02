@@ -1,25 +1,30 @@
 import os
-from task import Task, print_task
-from run import Run, print_run
-import scheduler as sc
-from scheduler import Schedule
-from toposort import toposort, toposort_flatten
-from dag.dot2dag import dot2dag, order_dag, dag2list, dag2allTasks, add_dag_indeces, dag2indeces
-from pace import get_pace_tasks
-import power_function_handler as pfun
-from application import Application, init_all_apps, reduce_application_space, get_tasks_per_power
+#from task import Task, print_task
+#from run import Run, print_run
+#import scheduler as sc
+#from scheduler import Schedule
+#from toposort import toposort, toposort_flatten
+#from dag.dot2dag import dot2dag, order_dag, dag2list, dag2allTasks, add_dag_indeces, dag2indeces
+#from pace import get_pace_tasks
+#import power_function_handler as pfun
+#from application import Application, init_all_apps, reduce_application_space, get_tasks_per_power
 import sys, getopt
 
-DEBUG = 0
-TRACE = 0
-NAIVE = 0
-POWOPT = 0
+from import_util import po2016
+from po2016 import job
+
+#DEBUG = 0
+#TRACE = 0
+#NAIVE = 0
+#POWOPT = 0
 
 num_machines = 0
 power_cap = 0
 num_apps = 0
 
 dag_name = ""
+
+##############COMMAND LINE STUFF#####################
 
 #myopts, args = getopt.getopt(sys.argv[1:],"k:C:a:d:N:P:D:T:")
 
@@ -54,6 +59,9 @@ dag_name = ""
     #print("\t-T [trace mode]")
     #print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
     #sys.exit(0)
+
+##################END OF COMMAND LINE STUFF######################
+
 
 if DEBUG:
     print("Initializing all applications...")
@@ -343,4 +351,12 @@ if POWOPT:
 if NAIVE:
     runs2file(runs, "naive-"+dag_name+".txt")
         
-    
+
+###########################################################################
+  
+dag_names = ["..", "..", ".."]
+
+
+policy = 'naive'
+
+job_queue = setup_jobs(dag_names, policy)

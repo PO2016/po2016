@@ -10,12 +10,8 @@ from po2016.run import Run, print_run
 
 
 DEBUG, TRACE = dbg.get_debug_level()
-
-
-def setup_dag_naive(dag_file_path, applications, num_apps):
-    setup_dag(dag_file_path, applications, num_apps)
     
-def naive(num_machines, power_cap, dag_file_path):
+def naive(num_machines, power_cap, job, applications):
     """ The naive policy divides the available power equally among tasks, which
     are kept in a queue. If the required power of a task awaiting its turn voilates
     the power cap, it and all tasks depending on it remain in the task queue, while
@@ -24,12 +20,12 @@ def naive(num_machines, power_cap, dag_file_path):
     Input parameters:
     num_machines - number of machine nodes requested
     power_cap - system-wide power cap
-    dag_file_path - path of the file describing the DAG, eg. .dot file
+    job - current job to execute
+    applications - dictionary with application index as key and Application object as value
     """
-    #Dictionary with application index as key and Application object as value
-    applications = init_all_apps(num_apps)
     
-    (task_graph, num_dag_nodes) = setup_dag_naive(dag_file_path, applications, num_apps)
+    task_graph = job.dag
+    task_graph.num_dag_nodes = job.num_dag_nodes
     
     if TRACE:           
         print("===========")

@@ -28,3 +28,10 @@ def print_run(run):
         print("\tconfig index:", run.config_index)
         print("\tdag_index:", run.dag_index)
         print("======================\\end of print_run==")
+        
+def get_total_runtime(runs):
+    max_time = 0
+    for run in runs:
+        if run.end_time >= max_time:
+            max_time = run.end_time
+    return max_time
