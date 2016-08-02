@@ -4,46 +4,22 @@ from po2016.application import Application, init_all_apps, num_apps, get_tasks_p
 from po2016.dag.dot2dag import setup_dag
 from po2016.pace import get_pace_tasks
 from po2016 import scheduler as sc
-from po2016.scheduler import Schedule
-from po2016.task import Task, print_task
-from po2016.run import Run, print_run
-
+from po2016.run import Run
 
 DEBUG, TRACE = dbg.get_debug_level()
 
-
-def setup_dag_naive(dag_file_path, applications, num_apps):
+def setup_dag_POW_Opt(dag_file_path, applications, num_apps):
     setup_dag(dag_file_path, applications, num_apps)
     
-def naive(num_machines, power_cap, dag_file_path):
-    """ The naive policy divides the available power equally among tasks, which
-    are kept in a queue. If the required power of a task awaiting its turn voilates
-    the power cap, it and all tasks depending on it remain in the task queue, while
-    a less power needy task may proceed.
+def POW_Opt(num_machines, power_cap, dag_file_path):
     
-    Input parameters:
-    num_machines - number of machine nodes requested
-    power_cap - system-wide power cap
-    dag_file_path - path of the file describing the DAG, eg. .dot file
-    """
-    #Dictionary with application index as key and Application object as value
     applications = init_all_apps(num_apps)
+    applications = reduce_application_space(applications)
     
-    (task_graph, num_dag_nodes) = setup_dag_naive(dag_file_path, applications, num_apps)
+    (task_graph, num_dag_nodes) = setup_dag_POW_Opt(dag_file_path, applications, num_apps)
     
-    if TRACE:           
-        print("===========")
-        
-        for el in task_graph:
-            print("...")
-            for e, val in el.items():
-                print("\t", e, ": (", len(val), ")")
-                print("\t\tapp_index: ", val[0].index, ", dag_index: ", val[0].dag_index)
-        print("===========")    
-
-    pace_tasks_toposorted = get_pace_tasks(task_graph)[0]
+    (task_pace_toposorted, all_pace_tasks) = get_pace_tasks(task_graph)
     
-    runs = []
     #Number of completed tasks
     num_completed_tasks = 0
 
@@ -53,32 +29,44 @@ def naive(num_machines, power_cap, dag_file_path):
     #List of all tasks that can be scheduled next (next in task_toposorted)
     ready_tasks = task_pace_toposorted[next_available]
     
-    #Sort according to decreasing power
-    ready_tasks = sorted(ready_tasks, key=lambda x: x.power, reverse = True)
-    
     #Tasks currently running
     current_schedule = sc.Schedule()
     
-    t = 0    
+    #List of all the 'rectangles' to draw
+    runs = []
+    
+    #Current time checked
+    t = 0
     
     while num_completed_tasks < num_dag_nodes:
-        
         tasks_removed = []
         num_tasks_removed = 0
         
+        #Sort according to decreasing power
+        ready_tasks = sorted(ready_tasks, key=lambda x: x.power, reverse = True)
+        
         remaining_power = power_cap - current_schedule.power_required
-        
         if DEBUG:
-            print("Remaining power:", remaining_power, "from power cap:", power_cap,
-                  ", current power: ",current_schedule.power_required)
+            print("Remaining power:", remaining_power, "from power cap:", power_cap, ", current power: ",current_schedule.power_required)
         
-        z = min(len(ready_tasks), num_machines - len(current_schedule.tasks))
+        y = 0
         
-        if z > 0:
-            power_per_run = remaining_power / z
+        #update y if p_pace_j <= C'
+        if len(ready_tasks) > 0:
+            if ready_tasks[0].power <= remaining_power:
+                sum_power = 0
+                for task in ready_tasks:
+                    if sum_power + task.power <= remaining_power:
+                        y += 1
+                    else:
+                        break
+                    sum_power += task.power
         
-            ready_tasks, z = get_tasks_per_power(ready_tasks, applications, power_per_run, power_cap)
-        
+        num_free_machines = abs(num_machines - len(current_schedule.tasks))
+        z = min(y, num_free_machines)
+        if DEBUG:
+            print("z", z, "y", y, "free_machines", num_free_machines)
+            
         if z >= 1:
             if len(ready_tasks) > 0:
                 if DEBUG:
@@ -90,15 +78,20 @@ def naive(num_machines, power_cap, dag_file_path):
                     print("Remaining power:", remaining_power, "from power cap:", power_cap, ", current power: ",current_schedule.power_required)
             elif DEBUG:
                 print("No more tasks to schedule until this group finishes processing")
-                              
-        sc.run_schedule(current_schedule, runs, num_machines)
+                
+        if DEBUG:        
+            print("Current schedule now contains", len(current_schedule.tasks), "tasks")
         
-        num_tasks_removed = len(current_schedule.tasks)
-        num_completed_tasks += len(current_schedule.tasks)
-        t = current_schedule.completion_time
-        current_schedule.start_time = t
-        current_schedule.tasks = []
-        current_schedule.init_schedule()
+        if current_schedule.power_required < power_cap / 2 and len(current_schedule.tasks) > 0:
+            if DEBUG:
+                print("Consuming less than half the power budget")
+            (current_schedule, runs, tasks_removed, num_tasks_removed) = sc.high_low(current_schedule, t, runs, num_machines - num_free_machines, power_cap, applications)
+            
+        else:
+            (runs, t, tasks_removed) = sc.finish_min_task(current_schedule, runs)
+            (runs, num_tasks_removed) = sc.process_schedule(current_schedule, t, runs, tasks_removed)
+        
+        num_completed_tasks += num_tasks_removed
         
         if DEBUG:
             print("Removed", num_tasks_removed, "tasks")
@@ -119,7 +112,5 @@ def naive(num_machines, power_cap, dag_file_path):
                     break
         elif DEBUG:
             print("This group has not completed running yet")
-                
-    return runs    
-    
-    
+            
+    return runs

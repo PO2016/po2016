@@ -1,5 +1,6 @@
-from task import Task
-from app_file_handler import load_task_file
+from import_util import po2016
+from po2016.task import Task
+from po2016.app_file_handler import load_task_file
 
 def get_pace_tasks(toposorted_tasks):
     all_pace_tasks = {}

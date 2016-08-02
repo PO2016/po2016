@@ -1,9 +1,14 @@
-import power_function_handler as pfun
-from app_file_handler import load_app_file, load_task_file
-from task import Task
-from pace import get_pace
+from import_util import po2016
+
+from po2016 import power_function_handler as pfun
+from po2016.app_file_handler import load_app_file, load_task_file
+from po2016.task import Task
+from po2016.pace import get_pace
 import copy
 import sys
+
+
+num_apps = 26
 
 class Application(object):
     

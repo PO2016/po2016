@@ -1,4 +1,5 @@
-from task import Task
+from import_util import po2016
+from po2016.task import Task
 import random
 
 taskDir = "applications"

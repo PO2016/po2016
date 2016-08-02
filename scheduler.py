@@ -1,8 +1,9 @@
-import power_function_handler as pfun
-import application
-from run import Run, print_run
+from import_util import po2016
+from po2016 import power_function_handler as pfun
+from po2016 import application
+from po2016.run import Run, print_run
 import copy
-from task import print_task
+from po2016.task import print_task
 import sys
 
 import numpy as np

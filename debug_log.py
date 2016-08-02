@@ -19,4 +19,7 @@ def set_debug_level(level):
     else:
         DEBUG = 0
         TRACE = 0
-    #return DEBUG, TRACE    
+    #return DEBUG, TRACE
+    
+def get_debug_level():
+    return DEBUG, TRACE
