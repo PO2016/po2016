@@ -55,37 +55,16 @@ class Job(object):
         elif run_start_time > -1 and job.completion_time < 0:
             job.completion_time = run.get_total_runtime(job.runs)
 
-        
-
         job.available_power = available_power
         job.available_nodes = available_nodes
-
-
 
         if job.completion_time < job.start_time:
             print("ERROR: Job completion time ahead of job start time!")
             sys.exit(1)
 
-
-
-
     def setup_jobs(dag_names, policy, requested_powers = [], requested_times = [],
         thresholds = []):
         
-        files = [f for f in os.listdir('policies')]
-        policy_valid = False
-        policies = []
-        for f in files:
-            name = f.split('.py')[0]
-            if len(name) > 0:
-                policies.append(name)
-            if name == policy:
-                policy_valid = True
-        if not policy_valid:
-            print("ERROR: Invalid policy specified. Please specify one of the following policies:")
-            for name in policies:
-                print("\t",name)
-            sys.exit(0)
             
         applications = init_all_apps(num_apps)
         if policy == "POW-Opt":

@@ -7,6 +7,7 @@ from po2016 import scheduler as sc
 from po2016.scheduler import Schedule
 from po2016.task import Task, print_task
 from po2016.run import Run, print_run
+from po2016 import job
 
 
 DEBUG, TRACE = dbg.get_debug_level()
@@ -118,4 +119,6 @@ def naive(num_machines, power_cap, job, applications):
                 
     return runs    
     
+
+def schedule_jobs(job_queue):
     

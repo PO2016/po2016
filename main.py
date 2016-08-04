@@ -354,9 +354,41 @@ if NAIVE:
 
 ###########################################################################
   
-dag_names = ["..", "..", ".."]
 
+def schedule_jobs(job_queue, policy):
+
+
+
+def verify_policy(policy):
+    files = [f for f in os.listdir('policies')]
+    policy_valid = False
+    policies = []
+    for f in files:
+        name = f.split('.py')[0]
+        if len(name) > 0:
+            policies.append(name)
+        if name == policy:
+            policy_valid = True
+    if not policy_valid:
+        print("ERROR: Invalid policy specified. Please specify one of the following policies:")
+        for name in policies:
+            print("\t",name)
+        sys.exit(0)
+    return policies
+
+dag_names = ["..", "..", ".."]
 
 policy = 'naive'
 
-job_queue = setup_jobs(dag_names, policy)
+policies = verify_policy(policy)
+
+if len(policies) > 0 and policy in policies:
+
+    policy_module = __import__(po216.policies.policy)
+
+    job_queue = setup_jobs(dag_names, policy)
+
+    policy_module.schedule_jobs(job_queue)
+
+else:
+    print("ERROR: Something went wrong with executing the policy.")
