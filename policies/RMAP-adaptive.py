@@ -36,7 +36,8 @@ def RMAP_adaptive(job_queue, power_cap, total_num_nodes):
             else:
                 runs += job_runs
 
-        update_job(job, job_runs, best_time, t, available_power, available_nodes)
+        job.runs = job_runs
+        update_job(job, available_power, available_nodes, best_time, t)
 
 
         if job.max_nodes < available_nodes:

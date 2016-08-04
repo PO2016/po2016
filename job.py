@@ -1,16 +1,18 @@
 from import_util import po2016
 
 from po2016.dag import print_dag_info
-from po2016.run import Run
+from po2016 import run
 from po2016.application import Application, init_all_apps, num_apps
 from po2016.dag.dot2dag import setup_dag
 import sys
 
 class Job(object):
 
-    def __init__(self, job_queue_index, dag_file_path, dag, num_dag_nodes, requested_power, requested_time,
-        threshold, start_time = 0.0, available_power = 0.0, available_nodes = 0.0, completion_power = 0.0, completion_time = 0.0,
-        completion_workload = 0.0, max_nodes = 0, resources_consumed = []):
+    def __init__(self, job_queue_index, dag_file_path, dag, num_dag_nodes,
+        requested_power, requested_time, threshold, start_time = -1,
+        available_power = -1, available_nodes = -1, completion_power = -1,
+        completion_time = -1, completion_workload = -1, max_nodes = -1, runs = []):
+        #resources_consumed = []):
         self.queue_index = int(job_queue_index)
         self.dag_file_path = dag_file_path
         self.dag = dag
@@ -20,20 +22,55 @@ class Job(object):
         self.deadline = float(requested_time)
         self.threshold = float(threshold)
 
-    def record_resource(start_time, duration, power, num_nodes, workload):
-        self.resources_consumed.append([float(start_time), float(duration),
-            float(power), int(num_nodes), float(workload)])
+        self.start_time = start_time
+        self.available_power = available_power
+        self.available_nodes = available_nodes
+        self.completion_power = completion_power
+        self.completion_time = completion_time
+        self.completion_workload = completion_workload
+        self.max_nodes = max_nodes
+        self.runs = runs
+    #def record_resource(start_time, duration, power, num_nodes, workload):
+    #    self.resources_consumed.append([float(start_time), float(duration),
+    #        float(power), int(num_nodes), float(workload)])
 
-    def update_job(job, job_runs, run_end_time, run_start_time, available_power, available_nodes):
-        job.start_time = run_start_time
-        job.completion_time = run_end_time
+    def update_job(job, available_power, available_nodes, run_end_time = -1,
+        run_start_time = -1):
+
+        (start, end, power, workload, nodes) = run.get_runs_stats(job.runs)
+
+        job.start_time = start
+        job.completion_time = end
+
+        job.completion_power = power
+        job.completion_workload = workload
+        job.max_nodes = nodes
+
+        if run_start_time > -1:
+            job.start_time = run_start_time
+        elif run_end_time > -1 and job.start_time < 0:
+            job.start_time = run.get_runs_start_time(job.runs)
+        if run_end_time > -1:
+            job.completion_time = run_end_time
+        elif run_start_time > -1 and job.completion_time < 0:
+            job.completion_time = run.get_total_runtime(job.runs)
+
+        
+
         job.available_power = available_power
         job.available_nodes = available_nodes
 
-        ???????
 
 
-    def setup_jobs(dag_names, policy, requested_powers = [], requested_times = [], thresholds = []):
+        if job.completion_time < job.start_time:
+            print("ERROR: Job completion time ahead of job start time!")
+            sys.exit(1)
+
+
+
+
+    def setup_jobs(dag_names, policy, requested_powers = [], requested_times = [],
+        thresholds = []):
         
         files = [f for f in os.listdir('policies')]
         policy_valid = False
