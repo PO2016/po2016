@@ -63,7 +63,7 @@ class Job(object):
             sys.exit(1)
 
     def setup_jobs(dag_names, policy, requested_powers = [], requested_times = [],
-        thresholds = []):
+        thresholds = [], app_outdir = 0, app_indir = 0):
         
             
         applications = init_all_apps(num_apps)
@@ -74,7 +74,7 @@ class Job(object):
         num_jobs = len(dag_names)
         
         for i in range(0, num_jobs):
-            (task_graph, num_dag_nodes) = setup_dag(dag_names[i], applications, num_apps)
+            (task_graph, num_dag_nodes) = setup_dag(dag_names[i], applications, num_apps, app_indir)
             requested_power = -1
             requested_time = -1
             threshold = -1
@@ -87,7 +87,7 @@ class Job(object):
             job = Job(i, dag_names[i], task_graph, num_dag_nodes, requested_power, requested_time, threshold)
             job_queue.append(job)
             
-        return job_queue
+        return job_queue, applications
         
 
     def print_job(job, debug_mode):

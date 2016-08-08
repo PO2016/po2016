@@ -353,9 +353,6 @@ if NAIVE:
         
 
 ###########################################################################
-  
-
-def schedule_jobs(job_queue, policy):
 
 
 
@@ -377,8 +374,13 @@ def verify_policy(policy):
     return policies
 
 dag_names = ["..", "..", ".."]
+nodes = [5,5,5]
+power_cap = 10
+system_nodes = 50
 
 policy = 'naive'
+
+outdir = ''
 
 policies = verify_policy(policy)
 
@@ -386,9 +388,15 @@ if len(policies) > 0 and policy in policies:
 
     policy_module = __import__(po216.policies.policy)
 
-    job_queue = setup_jobs(dag_names, policy)
+    (job_queue, applications) = setup_jobs(dag_names, policy, outdir) #indir)
 
-    policy_module.schedule_jobs(job_queue)
+    job_queue = policy_module.schedule_jobs(job_queue, nodes, power_cap, applications, outdir)
+
+    write_scheduler_output(job_queue, outdir)
 
 else:
     print("ERROR: Something went wrong with executing the policy.")
+
+
+def write_scheduler_output(job_queue, outdir):
+

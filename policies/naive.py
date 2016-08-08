@@ -11,7 +11,28 @@ from po2016 import job
 
 
 DEBUG, TRACE = dbg.get_debug_level()
-    
+
+
+#this needs refinement
+def schedule_jobs(job_queue, requested_nodes, power_cap, applications, outdir):
+
+    num_jobs = len(job_queue)
+    total_nodes_requested = sum(requested_nodes)
+    pow_node = power_cap / total_nodes_requested
+
+    for i in range(0, num_jobs):
+        job = job_queue[i]
+        num_nodes = requested_nodes[i]
+        alloc_power = pow_node * num_nodes
+        output = naive(num_nodes, alloc_power, job, applications)
+        if output == -1:
+            new_queue = job_queue[i+1:] + [job]
+            job_queue = new_queue
+        else:
+            job.runs = output
+        
+    return job_queue
+
 def naive(num_machines, power_cap, job, applications):
     """ The naive policy divides the available power equally among tasks, which
     are kept in a queue. If the required power of a task awaiting its turn voilates
@@ -85,6 +106,8 @@ def naive(num_machines, power_cap, job, applications):
                 remaining_power = power_cap - current_schedule.power_required
                 if DEBUG:
                     print("Remaining power:", remaining_power, "from power cap:", power_cap, ", current power: ",current_schedule.power_required)
+            elif z == -1:
+                return -1
             elif DEBUG:
                 print("No more tasks to schedule until this group finishes processing")
                               
@@ -117,8 +140,4 @@ def naive(num_machines, power_cap, job, applications):
         elif DEBUG:
             print("This group has not completed running yet")
                 
-    return runs    
-    
-
-def schedule_jobs(job_queue):
-    
+    return runs

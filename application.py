@@ -110,7 +110,8 @@ def get_tasks_per_power(tasks, applications, power, power_cap):
                 sys.exit()
             if len(waitlist) == len(tasks):
                 print("ERROR no tasks can be scheduled under the given power cap.")
-                sys.exit()
+                return [], -1
+                #sys.exit()
             #print("ERROR Couldn't find task for the power allocated. Power = ", power)
             #sys.exit()
             #new_task = applications[task.index].idle

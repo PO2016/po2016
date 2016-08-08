@@ -65,28 +65,34 @@ def dag2list(dag):
     l.sort(key=lambda x: x[0])
     return l, num_nodes
 
-def dag2allTasks(dag, applications, num_apps):
+def dag2allTasks(dag, applications, num_apps, app_file = 0):
     task_graph = []
     for group in dag:
         task_group_d = {}
         for index in group:
-            app_id = random.randint(0, num_apps - 1)
+            if app_file != 0:
+                #read from app file
+            else:
+                app_id = random.randint(0, num_apps - 1)
             task_group_d[index] = copy.deepcopy(applications[app_id].tasks)
         task_graph.append(task_group_d)
     return task_graph
 
-def add_dag_indeces(task_graph):
+def add_dag_indeces(task_graph, app_file = 0):
     wkld_base = 50
     for dictionary in task_graph:
         for dag_index, tasks in dictionary.items():
-            workload = wkld_base + dag_index * random.random()
+            if app_file != 0:
+                #read from app file
+            else:
+                workload = wkld_base + dag_index * random.random()
             for task in tasks:
                 task.dag_index = dag_index
                 task.workload = workload
     return task_graph
 
 
-def setup_dag(dag_file_path, applications, num_apps):
+def setup_dag(dag_file_path, applications, num_apps, app_indir = 0):
     '''TODO: add file exception handling'''
     dot_dag_file = open(dag_file_path,"r")
     dot_dag = dot2dag(dot_dag_file)
@@ -95,10 +101,15 @@ def setup_dag(dag_file_path, applications, num_apps):
     toposort_ordering = order_dag(dot_dag)
     dot_toposorted = list(toposort(dot_dag))
     task_graph_by_index = dag2indeces(dot_toposorted, toposort_ordering)
-    (task_graph_by_index, num_dag_nodes) = dag2list(task_graph_by_index)
+    (task_graph_by_index, num_dag_nodes) = dag2list(task_graph_by_index, app_indir)
     
-    task_graph = dag2allTasks(task_graph_by_index, applications, num_apps)
-    task_graph = add_dag_indeces(task_graph)
+    if app_indir != 0:
+        app_file = "" #read file
+    else:
+        app_file = 0
+
+    task_graph = dag2allTasks(task_graph_by_index, applications, num_apps, app_file)
+    task_graph = add_dag_indeces(task_graph, app_file)
     
     return task_graph, num_dag_nodes
     
