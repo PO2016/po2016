@@ -390,7 +390,7 @@ if len(policies) > 0 and policy in policies:
 
     (job_queue, applications) = setup_jobs(dag_names, policy, outdir) #indir)
 
-    job_queue = policy_module.schedule_jobs(job_queue, nodes, power_cap, applications, outdir)
+    job_queue = policy_module.schedule_jobs(job_queue, system_nodes, power_cap, applications, outdir)
 
     write_scheduler_output(job_queue, outdir)
 

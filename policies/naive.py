@@ -6,15 +6,40 @@ from po2016.pace import get_pace_tasks
 from po2016 import scheduler as sc
 from po2016.scheduler import Schedule
 from po2016.task import Task, print_task
-from po2016.run import Run, print_run
+from po2016.run import Run, print_run, get_total_runtime
 from po2016 import job
 
 
 DEBUG, TRACE = dbg.get_debug_level()
 
 
+def process_job_queue_sequentially(job_queue, requested_nodes, system_nodes, power_cap, applications, outdir):
+
+    num_jobs = len(job_queue)
+
+    start_time = 0
+
+    for i in range(0, num_jobs):
+        job = job_queue[i]
+        num_nodes = requested_nodes[i]
+        if num_nodes > system_nodes:
+            num_nodes = system_nodes
+        alloc_power = power_cap / num_nodes
+
+        output = naive(num_nodes, alloc_power, job, applications, start_time)
+
+        if output == - 1:
+            new_queue = job_queue[i+1:] + [job]
+            job_queue = new_queue
+        else:
+            job.runs = output
+            start_time += get_total_runtime(output)
+
+    return job_queue
+
 #this needs refinement
-def schedule_jobs(job_queue, requested_nodes, power_cap, applications, outdir):
+def schedule_jobs(job_queue, requested_nodes, system_nodes, power_cap, applications, outdir):
+
 
     num_jobs = len(job_queue)
     total_nodes_requested = sum(requested_nodes)
@@ -33,7 +58,7 @@ def schedule_jobs(job_queue, requested_nodes, power_cap, applications, outdir):
         
     return job_queue
 
-def naive(num_machines, power_cap, job, applications):
+def naive(num_machines, power_cap, job, applications, start_time = 0):
     """ The naive policy divides the available power equally among tasks, which
     are kept in a queue. If the required power of a task awaiting its turn voilates
     the power cap, it and all tasks depending on it remain in the task queue, while
