@@ -1,6 +1,6 @@
 from import_util import po2016
 
-from po2016.dag import print_dag_info
+from po2016.dag.dot2dag import print_dag_info
 from po2016 import run
 from po2016.application import Application, init_all_apps, num_apps
 from po2016.dag.dot2dag import setup_dag

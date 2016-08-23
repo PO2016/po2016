@@ -72,6 +72,7 @@ def dag2allTasks(dag, applications, num_apps, app_file = 0):
         for index in group:
             if app_file != 0:
                 #read from app file
+                app_file = 0 #CHANGE
             else:
                 app_id = random.randint(0, num_apps - 1)
             task_group_d[index] = copy.deepcopy(applications[app_id].tasks)
@@ -84,6 +85,7 @@ def add_dag_indeces(task_graph, app_file = 0):
         for dag_index, tasks in dictionary.items():
             if app_file != 0:
                 #read from app file
+                app_file = 0 #CHANGE
             else:
                 workload = wkld_base + dag_index * random.random()
             for task in tasks:
@@ -112,4 +114,8 @@ def setup_dag(dag_file_path, applications, num_apps, app_indir = 0):
     task_graph = add_dag_indeces(task_graph, app_file)
     
     return task_graph, num_dag_nodes
+
+
+def print_dag_info(dag):
+    return 0
     
