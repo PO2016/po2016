@@ -43,11 +43,25 @@ def schedule_jobs(job_queue, requested_nodes, system_nodes, power_cap, applicati
 
     num_jobs = len(job_queue)
     total_nodes_requested = sum(requested_nodes)
+    
+    if total_nodes_requested > system_nodes:
+        total_nodes_requested = system_nodes
+    
     pow_node = power_cap / total_nodes_requested
 
+    start_time = 0
+
+    available_nodes = system_nodes
+    
     for i in range(0, num_jobs):
+        
         job = job_queue[i]
         num_nodes = requested_nodes[i]
+        
+        if num_nodes <= available_nodes:
+            
+            available_nodes 
+        
         alloc_power = pow_node * num_nodes
         output = naive(num_nodes, alloc_power, job, applications)
         if output == -1:
