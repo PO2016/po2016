@@ -114,3 +114,8 @@ class Job(object):
                 print("\t\t\tnodes:", resources[3])
                 print("\t\t\tworkload:", resources[4])
         print("++++++++END JOB INFO+++++++++++++++")
+
+
+
+def process_job_schedules(job_schedules, outdir):
+    return 0

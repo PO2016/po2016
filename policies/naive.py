@@ -9,6 +9,8 @@ from po2016.task import Task, print_task
 from po2016.run import Run, print_run, get_total_runtime
 from po2016 import job
 
+from copy import deepcopy
+
 
 DEBUG, TRACE = dbg.get_debug_level()
 
@@ -24,6 +26,11 @@ def process_job_queue_sequentially(job_queue, requested_nodes, system_nodes, pow
         num_nodes = requested_nodes[i]
         if num_nodes > system_nodes:
             num_nodes = system_nodes
+
+        if num_nodes > system_nodes:
+            sys.exit("ERROR: Number of requested nodes for job", job.queue_index,
+                "exceeds the number of nodes in the system.")
+        
         alloc_power = power_cap / num_nodes
 
         output = naive(num_nodes, alloc_power, job, applications, start_time)
@@ -37,9 +44,8 @@ def process_job_queue_sequentially(job_queue, requested_nodes, system_nodes, pow
 
     return job_queue
 
-#this needs refinement
-def schedule_jobs(job_queue, requested_nodes, system_nodes, power_cap, applications, outdir):
 
+def process_job_queue_even_power_distribution(job_queue, requested_nodes, system_nodes, power_cap, applications, outdir):
 
     num_jobs = len(job_queue)
     total_nodes_requested = sum(requested_nodes)
@@ -52,25 +58,53 @@ def schedule_jobs(job_queue, requested_nodes, system_nodes, power_cap, applicati
     start_time = 0
 
     available_nodes = system_nodes
-    
+
+    previous_finish_time = 0
+
     for i in range(0, num_jobs):
         
         job = job_queue[i]
         num_nodes = requested_nodes[i]
         
-        if num_nodes <= available_nodes:
-            
-            available_nodes 
-        
+        if num_nodes > system_nodes:
+            sys.exit("ERROR: Number of requested nodes for job", job.queue_index, "exceeds the number of nodes in the system.")
+
+        if num_nodes > available_nodes:
+            start_time = previous_finish_time
+            available_nodes = system_nodes
+
+        available_nodes -= num_nodes
+
         alloc_power = pow_node * num_nodes
-        output = naive(num_nodes, alloc_power, job, applications)
+
+        output = naive(num_nodes, alloc_power, job, applications, start_time)
+
         if output == -1:
+
             new_queue = job_queue[i+1:] + [job]
             job_queue = new_queue
+
         else:
+
             job.runs = output
+            previous_finish_time = get_total_runtime(output)
         
     return job_queue
+
+
+def schedule_jobs(job_queue, requested_nodes, system_nodes, power_cap, applications, outdir):
+
+    scheduling_functions = [process_job_queue_sequentially, process_job_queue_even_power_distribution]
+
+    job_schedules = []
+
+    for fun in scheduling_functions:
+        job_schedules.append(fun(deepcopy(job_queue), requested_nodes, system_nodes, power_cap, applications, outdir))
+
+
+    job.process_job_schedules(job_schedules, outdir)
+
+
 
 def naive(num_machines, power_cap, job, applications, start_time = 0):
     """ The naive policy divides the available power equally among tasks, which
@@ -116,7 +150,7 @@ def naive(num_machines, power_cap, job, applications, start_time = 0):
     #Tasks currently running
     current_schedule = sc.Schedule()
     
-    t = 0    
+    t = start_time    
     
     while num_completed_tasks < num_dag_nodes:
         
@@ -154,7 +188,7 @@ def naive(num_machines, power_cap, job, applications, start_time = 0):
         
         num_tasks_removed = len(current_schedule.tasks)
         num_completed_tasks += len(current_schedule.tasks)
-        t = current_schedule.completion_time
+        t += current_schedule.completion_time
         current_schedule.start_time = t
         current_schedule.tasks = []
         current_schedule.init_schedule()
