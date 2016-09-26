@@ -90,6 +90,7 @@ def setup_jobs(dag_names, policy, requested_powers = [], requested_times = [],
     return job_queue, applications
     
 
+
 def print_job(job, debug_mode):
     print("++++++++++++JOB INFO+++++++++++++++")
     print("Job:")
@@ -114,3 +115,7 @@ def print_job(job, debug_mode):
             print("\t\t\tnodes:", resources[3])
             print("\t\t\tworkload:", resources[4])
     print("++++++++END JOB INFO+++++++++++++++")
+
+def process_job_schedules(job_schedules, outdir):
+    return 0
+
