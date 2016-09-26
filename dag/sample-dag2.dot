@@ -1,0 +1,15 @@
+digraph G {
+__entry_0_012 -> 1
+1 -> copy___t_1_HARD_0_013
+__entry_0_012 -> 2
+2 -> copy___t_2_SOFT_0_013
+__entry_0_012 -> 3
+3 -> copy___t_3_RANK_0_013
+__entry_0_012 -> 4
+4 -> copy___t_4_NODE_0_013
+-3 -> f1_argwait_0_013
+-2 -> f2_argwait_0_013
+f2_0_013 -> -3
+f2_0_013 -> -2
+f2_0_013 -> -1
+}

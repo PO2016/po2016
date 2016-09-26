@@ -1,6 +1,7 @@
 import random
 import copy
 import networkx as nx
+from toposort import toposort, toposort_flatten
 
 def dot2dag(dot):
     dag = {}
@@ -96,6 +97,7 @@ def add_dag_indeces(task_graph, app_file = 0):
 
 def setup_dag(dag_file_path, applications, num_apps, app_indir = 0):
     '''TODO: add file exception handling'''
+    '''TODO: test reading application index assignment from file'''
     dot_dag_file = open(dag_file_path,"r")
     dot_dag = dot2dag(dot_dag_file)
     dot_dag_file.close()
@@ -103,10 +105,10 @@ def setup_dag(dag_file_path, applications, num_apps, app_indir = 0):
     toposort_ordering = order_dag(dot_dag)
     dot_toposorted = list(toposort(dot_dag))
     task_graph_by_index = dag2indeces(dot_toposorted, toposort_ordering)
-    (task_graph_by_index, num_dag_nodes) = dag2list(task_graph_by_index, app_indir)
+    (task_graph_by_index, num_dag_nodes) = dag2list(task_graph_by_index)
     
     if app_indir != 0:
-        app_file = "" #read file
+        app_file = open(app_indir, 'r')
     else:
         app_file = 0
 

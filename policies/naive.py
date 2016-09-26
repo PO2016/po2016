@@ -38,7 +38,7 @@ def process_job_queue_sequentially(job_queue, requested_nodes, system_nodes, pow
     return job_queue
 
 #this needs refinement
-def schedule_jobs(job_queue, requested_nodes, system_nodes, power_cap, applications, outdir):
+def schedule_jobs(job_queue, system_nodes, requested_nodes, power_cap, applications, outdir):
 
 
     num_jobs = len(job_queue)

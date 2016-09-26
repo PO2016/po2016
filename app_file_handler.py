@@ -6,6 +6,8 @@ taskDir = "applications"
 
 wkld_base = 10.0
 
+idle_power = 90
+
 def load_task_file(index):
 
     app_tasks = []
